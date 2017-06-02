@@ -1,5 +1,7 @@
 %{
 package simple_template
+
+import "strconv"
 %}
 %type<expr> expr
 %type<expr> prefixexp
@@ -46,7 +48,8 @@ expr:
 		$$.SetLine($1.Line())
 	}|
 	TNumber {
-		$$ = &NumberExpr{Value: $1.Str}
+	    v, _ := strconv.ParseFloat($1.Str, 0)
+		$$ = &NumberExpr{Value: v}
 		$$.SetLine($1.Line())
 	}|
 	TTrue {
@@ -132,8 +135,8 @@ prefixexp:
     }
 
 functioncall:
-    prefixexp args {
-        $$ = &FuncCallExpr{Func: $1, Args: $2}
+    TIdent args {
+        $$ = &FuncCallExpr{Func: &IdentExpr{Value:$1.Str}, Args: $2}
         $$.SetLine($1.Line())
     }
 

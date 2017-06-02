@@ -59,11 +59,11 @@ func (b *StringExpr) String() string {
 type NumberExpr struct {
 	BaseExpr
 
-	Value string
+	Value float64
 }
 
 func (e *NumberExpr) String() string {
-	return fmt.Sprintf("<numexpr,%s>", e.Value)
+	return fmt.Sprintf("<numexpr,%v>", e.Value)
 }
 
 type TrueExpr struct {

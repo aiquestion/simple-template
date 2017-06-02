@@ -24,7 +24,6 @@ var TOKEN_MAP = map[string]rune{
 func Parse(code string) []Expr {
 	s := &scanner.Scanner{}
 	s.Init(strings.NewReader(code))
-	// TODO need to skip comment
 	lex := &yyLexerImpl{
 		scanner: s,
 	}
@@ -36,6 +35,7 @@ func Parse(code string) []Expr {
 type yyLexerImpl struct {
 	scanner *scanner.Scanner
 	Stmt    []Expr
+	Errors  []string
 }
 
 func (y *yyLexerImpl) Lex(lval *yySymType) int {
@@ -108,6 +108,9 @@ func (y *yyLexerImpl) Lex(lval *yySymType) int {
 	if token.Str == "" {
 		token.Str = y.scanner.TokenText()
 	}
+	if token.Type == TString && len(token.Str) > 1 {
+		token.Str = token.Str[1 : len(token.Str)-1]
+	}
 	tpos := y.scanner.Pos()
 	token.Pos = Position{
 		Source: tpos.Filename,
@@ -121,6 +124,5 @@ func (y *yyLexerImpl) Lex(lval *yySymType) int {
 	return int(token.Type)
 }
 func (y *yyLexerImpl) Error(s string) {
-	// TODO
-	fmt.Println("#######" + s)
+	y.Errors = append(y.Errors, s)
 }
