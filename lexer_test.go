@@ -16,6 +16,14 @@ func Test_Lexer(t *testing.T) {
 				 }else{ 789 }`,
 				[]string{`<if(<<<identxpr,event>[<strexpr,did>]>,==,<strexpr,123456>>)then{<numexpr,123>}else{<numexpr,789>}>`},
 			},
+			{
+				`did`,
+				[]string{`<identxpr,did>`},
+			},
+			{
+				`did[1][2]["test"]`,
+				[]string{`<<<<identxpr,did>[<numexpr,1>]>[<numexpr,2>]>[<strexpr,test>]>`},
+			},
 		}
 		for _, testCase := range testTable {
 			ress := Parse(testCase.Input)

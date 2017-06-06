@@ -119,7 +119,7 @@ func (e *ArithmeticOpExpr) String() string {
 type FuncCallExpr struct {
 	BaseExpr
 
-	Func Expr
+	Func *IdentExpr
 	Args []Expr
 }
 
