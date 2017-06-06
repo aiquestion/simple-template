@@ -53,6 +53,14 @@ func TestExecuteContext_EvaluateExpression(t *testing.T) {
 				`world`,
 			},
 			{
+				` if (age != 29 || language[1] ) {language[0]} else {"world"}`,
+				`golang`,
+			},
+			{
+				` age != 29 || marry`,
+				`true`,
+			},
+			{
 				`test(29, name)`,
 				`29,truman`,
 			},
@@ -82,4 +90,33 @@ func TestExecuteContext_EvaluateExpression(t *testing.T) {
 			So(fmt.Sprintf("%v", val), ShouldEqual, c.Output)
 		}
 	})
+}
+
+func BenchmarkExecuteContext_EvaluateExpression(b *testing.B) {
+
+	test := func(input []interface{}) (interface{}, error) {
+		return fmt.Sprintf("%v,%v", input[0], input[1]), nil
+	}
+	ec := NewExecuteContenxt(map[string]interface{}{
+		"name":     "truman",
+		"age":      float64(29),
+		"marry":    true,
+		"language": []interface{}{"golang", "erlang", "lisp"},
+	}, map[string]Func{
+		"test": test,
+	})
+	for i := 0; i < b.N; i++ {
+		ress, errs := Parse(`if (age != 29 || language[1] ) {language[0]} else {"world"}`)
+		if errs != nil {
+			b.Fatalf("err: %v", errs)
+		}
+		res := ress[0]
+		val, err := ec.EvaluateExpression(res)
+		if err != nil {
+			b.Fatalf("err: %v", err)
+		}
+		if fmt.Sprintf("%v", val) != "golang" {
+			b.Fatal(`expected "golang"`)
+		}
+	}
 }
