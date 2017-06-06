@@ -21,7 +21,7 @@ var TOKEN_MAP = map[string]rune{
 	"false": TFalse,
 }
 
-func Parse(code string) []Expr {
+func Parse(code string) ([]Expr, []string) {
 	s := &scanner.Scanner{}
 	s.Init(strings.NewReader(code))
 	lex := &yyLexerImpl{
@@ -29,7 +29,7 @@ func Parse(code string) []Expr {
 	}
 	parser := yyNewParser()
 	parser.Parse(lex)
-	return lex.Stmt
+	return lex.Stmt, lex.Errors
 }
 
 type yyLexerImpl struct {
@@ -96,6 +96,26 @@ func (y *yyLexerImpl) Lex(lval *yySymType) int {
 		if y.scanner.Peek() == '=' {
 			token.Str = "<="
 			if t, ok := TOKEN_MAP["<="]; ok {
+				token.Type = t
+			}
+			y.scanner.Scan()
+		} else {
+			token.Type = r
+		}
+	case '&':
+		if y.scanner.Peek() == '&' {
+			token.Str = "&&"
+			if t, ok := TOKEN_MAP["&&"]; ok {
+				token.Type = t
+			}
+			y.scanner.Scan()
+		} else {
+			token.Type = r
+		}
+	case '|':
+		if y.scanner.Peek() == '|' {
+			token.Str = "||"
+			if t, ok := TOKEN_MAP["||"]; ok {
 				token.Type = t
 			}
 			y.scanner.Scan()

@@ -2,14 +2,14 @@ package simple_template
 
 import (
 	"fmt"
-	"reflect"
 	"math"
+	"reflect"
 )
 
 func NewExecuteContenxt(idents map[string]interface{}, funcs map[string]Func) *ExecuteContext {
 	return &ExecuteContext{
 		definedIdent: idents,
-		definedFunc: funcs,
+		definedFunc:  funcs,
 	}
 }
 
@@ -22,6 +22,14 @@ type ExecuteContext struct {
 
 func (ec *ExecuteContext) EvaluateExpression(expr Expr) (interface{}, error) {
 	switch vt := expr.(type) {
+	case *StringExpr:
+		return vt.Value, nil
+	case *NumberExpr:
+		return vt.Value, nil
+	case *TrueExpr:
+		return true, nil
+	case *FalseExpr:
+		return false, nil
 	case *IdentExpr:
 		return ec.evalIdentityExpr(vt)
 	case *LogicalExpr:
@@ -207,7 +215,7 @@ func (ec *ExecuteContext) evalArithmethicExpr(e *ArithmeticOpExpr) (interface{},
 	if err != nil {
 		return false, err
 	}
-	switch e.Operator{
+	switch e.Operator {
 	case "+":
 		_, lok := left.(string)
 		_, rok := right.(string)
@@ -316,4 +324,3 @@ func (ec *ExecuteContext) evalAttrGetExpr(e *AttrGetExpr) (interface{}, error) {
 
 	return nil, fmt.Errorf("object %v is not array or map", obj)
 }
-

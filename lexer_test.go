@@ -26,7 +26,8 @@ func Test_Lexer(t *testing.T) {
 			},
 		}
 		for _, testCase := range testTable {
-			ress := Parse(testCase.Input)
+			ress, errs := Parse(testCase.Input)
+			So(errs, ShouldBeNil)
 			So(len(ress), ShouldEqual, len(testCase.Output))
 
 			for index, v := range ress {
