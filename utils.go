@@ -4,7 +4,7 @@ import "strconv"
 
 /**
 only have 3 types in this template language: string/bool/float64
- */
+*/
 
 func TryBool(v interface{}) (bool, bool) {
 	if v == nil {
@@ -21,7 +21,7 @@ func TryBool(v interface{}) (bool, bool) {
 	return false, false
 }
 
-func TryNumber(v interface{})(float64, bool){
+func TryNumber(v interface{}) (float64, bool) {
 	if v == nil {
 		return 0, true
 	}
@@ -29,7 +29,7 @@ func TryNumber(v interface{})(float64, bool){
 	case bool:
 		if tv {
 			return 1, true
-		}else{
+		} else {
 			return 0, true
 		}
 	case float64:
@@ -42,7 +42,7 @@ func TryNumber(v interface{})(float64, bool){
 	return 0, false
 }
 
-func TryString(v interface{})(string, bool){
+func TryString(v interface{}) (string, bool) {
 	if v == nil {
 		return "", true
 	}
@@ -50,7 +50,7 @@ func TryString(v interface{})(string, bool){
 	case bool:
 		if tv {
 			return "1", true
-		}else{
+		} else {
 			return "0", true
 		}
 	case float64:
