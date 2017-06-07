@@ -1,6 +1,11 @@
 %{
 package simple_template
 
+/**
+THIS FILE IS AUTO-GENERATE BY GOYACC
+DO NOT EDIT
+**/
+
 import "strconv"
 %}
 %type<expr> expr
