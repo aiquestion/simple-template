@@ -72,6 +72,10 @@ func TestExecuteContext_EvaluateExpression(t *testing.T) {
 				`if (isNaN(toNumber("29"))){"nan"}else{"num"}`,
 				`num`,
 			},
+			{
+				`1+1+"123"`,
+				`2123`,
+			},
 		}
 
 		test := func(input []interface{}) (interface{}, error) {

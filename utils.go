@@ -54,7 +54,7 @@ func TryString(v interface{}) (string, bool) {
 			return "0", true
 		}
 	case float64:
-		return strconv.FormatFloat(tv, 'f', -1, 0), true
+		return strconv.FormatFloat(tv, 'f', -1, 64), true
 	case string:
 		return tv, true
 	}

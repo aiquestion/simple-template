@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+<form id="input">
+<div>
+<textarea name="code" style="width: 500px; height: 200px"></textarea> code here
+</div>
+<div>
+<textarea name="define" style="width: 500px; height: 200px"></textarea> define as json here like: {"name":"golang", "age": 29}
+</div>
+</form>
+<div>
+<button onclick="run()">Run</button>
+</div>
+<div>
+<textarea id="result" style="width: 500px; height: 100px"></textarea>
+</div>
+<script>
+    function run(){
+        $("#result").val("");
+        $.post({
+            type: "POST",
+            url: "/run",
+            data:$('#input').serialize(),
+            async: false,
+            error: function(request) {
+                alert("Connection error");
+            },
+            success: function(data) {
+                $("#result").val(data);
+            }
+        })
+    }
+</script>
+
+</body>
+</html>
