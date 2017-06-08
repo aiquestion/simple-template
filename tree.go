@@ -331,8 +331,30 @@ func (ec *ExecuteContext) evalAttrGetExpr(e *AttrGetExpr) (interface{}, error) {
 
 	// map
 	if objr.Type().Kind() == reflect.Map {
-		res := objr.MapIndex(reflect.ValueOf(key))
-		return res.Interface(), nil
+		keyType := objr.Type().Key()
+		if keyType.Kind() != reflect.String && keyType.Kind() != reflect.Float64 {
+			return nil, fmt.Errorf("map key must be string or number, current %v", keyType)
+		}
+		keyVal := reflect.ValueOf(key)
+		if keyType.Kind() == reflect.String && keyVal.Type().Kind() != reflect.String {
+			if sKey, ok := TryString(key); ok {
+				keyVal = reflect.ValueOf(sKey)
+			} else {
+				return nil, nil
+			}
+		} else if keyType.Kind() == reflect.Float64 && keyVal.Type().Kind() != reflect.Float64 {
+			if sKey, ok := TryNumber(key); ok {
+				keyVal = reflect.ValueOf(sKey)
+			} else {
+				return nil, nil
+			}
+		}
+		res := objr.MapIndex(keyVal)
+		if res.IsValid() {
+			return res.Interface(), nil
+		}
+		return nil, nil
+
 	}
 
 	return nil, fmt.Errorf("object %v is not array or map", obj)

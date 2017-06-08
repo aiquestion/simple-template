@@ -76,6 +76,14 @@ func TestExecuteContext_EvaluateExpression(t *testing.T) {
 				`1+1+"123"`,
 				`2123`,
 			},
+			{
+				`numMap[1] + "123"`,
+				`val1123`,
+			},
+			{
+				`numMap[3] + "123"`,
+				`123`,
+			},
 		}
 
 		test := func(input []interface{}) (interface{}, error) {
@@ -86,6 +94,10 @@ func TestExecuteContext_EvaluateExpression(t *testing.T) {
 			"age":      float64(29),
 			"marry":    true,
 			"language": []interface{}{"golang", "erlang", "lisp"},
+			"numMap": map[string]string{
+				"1": "val1",
+				"2": "val2",
+			},
 		}, map[string]Func{
 			"test": test,
 		})
