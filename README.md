@@ -3,7 +3,7 @@
 Implement a simple template script interpreter.  
 Using golang text/scanner as lexer, goyacc to generate parser.
 
-Status: just finish lexer&parser
+playground: http://aiquestion.com:8080/play.html
 
 Dep:
 go get github.com/smartystreets/goconvey
