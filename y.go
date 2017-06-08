@@ -72,7 +72,6 @@ const yyErrCode = 2
 const yyInitialStackSize = 16
 
 //line parser.go.y:168
-
 func TokenName(c int) string {
 	if c >= TAnd && c-TAnd < len(yyToknames) {
 		if yyToknames[c-TAnd] != "" {

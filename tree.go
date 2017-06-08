@@ -6,10 +6,23 @@ import (
 	"reflect"
 )
 
+var buildIns = map[string]Func{
+	"toNumber": toNumber,
+	"toBool":   toBool,
+	"isNaN":    isNaN,
+}
+
 func NewExecuteContenxt(idents map[string]interface{}, funcs map[string]Func) *ExecuteContext {
+	finalFunc := make(map[string]Func)
+	for k, v := range buildIns {
+		finalFunc[k] = v
+	}
+	for k, v := range funcs {
+		finalFunc[k] = v
+	}
 	return &ExecuteContext{
 		definedIdent: idents,
-		definedFunc:  funcs,
+		definedFunc:  finalFunc,
 	}
 }
 

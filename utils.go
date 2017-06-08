@@ -37,7 +37,7 @@ func TryNumber(v interface{}) (float64, bool) {
 
 	case string:
 		num, err := strconv.ParseFloat(tv, 0)
-		return num, err != nil
+		return num, err == nil
 	}
 	return 0, false
 }

@@ -57,12 +57,20 @@ func TestExecuteContext_EvaluateExpression(t *testing.T) {
 				`golang`,
 			},
 			{
+				`(2+4)*5`,
+				`30`,
+			},
+			{
 				` age != 29 || marry`,
 				`true`,
 			},
 			{
 				`test(29, name)`,
 				`29,truman`,
+			},
+			{
+				`if (isNaN(toNumber("29"))){"nan"}else{"num"}`,
+				`num`,
 			},
 		}
 
