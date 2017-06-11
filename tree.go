@@ -177,11 +177,11 @@ func (ec *ExecuteContext) evalLogicalExpr(e *LogicalExpr) (bool, error) {
 		_, lok = left.(string)
 		_, rok = right.(string)
 		if lok && rok {
-			lb, ok := TryBool(left)
+			lb, ok := TryString(left)
 			if !ok {
 				return false, nil
 			}
-			rb, ok := TryBool(right)
+			rb, ok := TryString(right)
 			if !ok {
 				return false, nil
 			}
