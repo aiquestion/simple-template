@@ -2,8 +2,9 @@ package simple_template
 
 import (
 	"fmt"
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestExecuteContext_EvaluateExpression(t *testing.T) {
@@ -83,6 +84,15 @@ func TestExecuteContext_EvaluateExpression(t *testing.T) {
 			{
 				`numMap[3] + "123"`,
 				`123`,
+			},
+			{
+				`{1,2,3,4,5}`,
+				`[1 2 3 4 5]`,
+			},
+			{
+				`{ name: 123,
+				"age2": true}`,
+				`map[truman:123 age2:true]`,
 			},
 		}
 

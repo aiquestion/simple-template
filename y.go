@@ -767,7 +767,7 @@ yydefault:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		//line parser.go.y:182
 		{
-			yyVAL.exprs = make([]*MapItemExpr, 0)
+			yyVAL.exprs = []Expr{yyDollar[1].expr}
 		}
 	case 34:
 		yyDollar = yyS[yypt-3 : yypt+1]

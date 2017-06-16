@@ -55,8 +55,42 @@ func (ec *ExecuteContext) EvaluateExpression(expr Expr) (interface{}, error) {
 		return ec.evalAttrGetExpr(vt)
 	case *FuncCallExpr:
 		return ec.evalFuncCallExpr(vt)
+	case *MapConstructExpr:
+		return ec.evalMapConstructExpr(vt)
+	case *ArrayConstructExpr:
+		return ec.evalArrayConstructExpr(vt)
 	}
 	return nil, fmt.Errorf("unknow expression %T", expr)
+}
+func (ec *ExecuteContext) evalMapConstructExpr(e *MapConstructExpr) (interface{}, error) {
+	result := make(map[interface{}]interface{})
+	for _, m := range e.Members {
+		mt, ok := m.(*MapItemExpr)
+		if !ok {
+			return nil, fmt.Errorf("line %v map expr with no map item expr", e.Line())
+		}
+		k, err := ec.EvaluateExpression(mt.Key)
+		if err != nil {
+			return nil, err
+		}
+		v, err := ec.EvaluateExpression(mt.Value)
+		if err != nil {
+			return nil, err
+		}
+		result[k] = v
+	}
+	return result, nil
+}
+func (ec *ExecuteContext) evalArrayConstructExpr(e *ArrayConstructExpr) (interface{}, error) {
+	result := make([]interface{}, 0, len(e.Members))
+	for _, m := range e.Members {
+		k, err := ec.EvaluateExpression(m)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, k)
+	}
+	return result, nil
 }
 
 func (ec *ExecuteContext) evalFuncCallExpr(e *FuncCallExpr) (interface{}, error) {

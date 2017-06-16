@@ -186,7 +186,7 @@ func (e *MapItemExpr) String() string {
 type MapConstructExpr struct {
 	BaseExpr
 
-	Members []*MapItemExpr
+	Members []Expr
 }
 
 func (e *MapConstructExpr) String() string {
@@ -194,5 +194,5 @@ func (e *MapConstructExpr) String() string {
 	for _, m := range e.Members {
 		memStrs = append(memStrs, m.String())
 	}
-	return fmt.Sprintf("<array(%s)>", strings.Join(memStrs, ","))
+	return fmt.Sprintf("<map(%s)>", strings.Join(memStrs, ","))
 }
