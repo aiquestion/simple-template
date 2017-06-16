@@ -24,6 +24,10 @@ func Test_Lexer(t *testing.T) {
 				`did[1][2]["test"]`,
 				[]string{`<<<<identxpr,did>[<numexpr,1>]>[<numexpr,2>]>[<strexpr,test>]>`},
 			},
+			{
+				`{1, 3, 4, 5}`,
+				[]string{`<<<<identxpr,did>[<numexpr,1>]>[<numexpr,2>]>[<strexpr,test>]>`},
+			},
 		}
 		for _, testCase := range testTable {
 			ress, errs := Parse(testCase.Input)

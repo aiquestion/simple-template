@@ -24,7 +24,7 @@ import "strconv"
 }
 
 %token<token> TIf TElse TEqeq TNeq TGteq TLteq TAnd TOr TTrue TFalse
-%token<token> TIdent TString TNumber '('
+%token<token> TIdent TString TNumber '(' '{'
 
 %left TOr
 %left TAnd
@@ -131,7 +131,11 @@ expr:
 		$$.SetLine($1.Line())
 	}|
 	'{' exprlist '}' {
-	    $$ = &ArrayConstructExpr{Members: $$2}
+	    $$ = &ArrayConstructExpr{Members: $2}
+		$$.SetLine($1.Line())
+	}|
+	'{' mapitemlist '}' {
+	    $$ = &MapConstructExpr{Members: $2}
 		$$.SetLine($1.Line())
 	}
 
@@ -175,9 +179,11 @@ var:
     }
 
 mapitemlist:
-    mapite {
-        $$ = []*MapItemExpr{}
-        $$.SetLine($1.Line())
+    mapitem {
+        $$ = make([]*MapItemExpr, 0)
+    }|
+    mapitemlist ',' mapitem {
+        $$ = append($1, $3)
     }
 
 mapitem:
