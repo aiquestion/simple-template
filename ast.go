@@ -157,3 +157,42 @@ func (e *IfExpr) String() string {
 		return fmt.Sprintf("<if(%s)then{%s}else{%s}>", e.Cond.String(), e.Then.String(), e.Else.String())
 	}
 }
+
+type ArrayConstructExpr struct {
+	BaseExpr
+
+	Members []Expr
+}
+
+func (e *ArrayConstructExpr) String() string {
+	memStrs := make([]string, 0, len(e.Members))
+	for _, m := range e.Members {
+		memStrs = append(memStrs, m.String())
+	}
+	return fmt.Sprintf("<array(%s)>", strings.Join(memStrs, ","))
+}
+
+type MapItemExpr struct {
+	BaseExpr
+
+	Key   Expr
+	Value Expr
+}
+
+func (e *MapItemExpr) String() string {
+	return fmt.Sprintf("%s=>%s", e.Key.String(), e.Value.String())
+}
+
+type MapConstructExpr struct {
+	BaseExpr
+
+	Members []*MapItemExpr
+}
+
+func (e *MapConstructExpr) String() string {
+	memStrs := make([]string, 0, len(e.Members))
+	for _, m := range e.Members {
+		memStrs = append(memStrs, m.String())
+	}
+	return fmt.Sprintf("<array(%s)>", strings.Join(memStrs, ","))
+}

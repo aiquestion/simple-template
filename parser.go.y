@@ -12,6 +12,8 @@ import "strconv"
 %type<expr> prefixexp
 %type<expr> functioncall
 %type<expr> var
+%type<expr> mapitem
+%type<exprs> mapitemlist
 %type<exprs> args
 %type<exprs> exprlist
 
@@ -122,10 +124,17 @@ expr:
 	}|
 	TIf '(' expr ')' '{' expr '}' {
 	    $$ = &IfExpr{Cond: $3, Then: $6}
+		$$.SetLine($1.Line())
 	}|
 	TIf '(' expr ')' '{' expr '}' TElse '{' expr '}' {
 	    $$ = &IfExpr{Cond: $3, Then: $6, Else: $10}
+		$$.SetLine($1.Line())
+	}|
+	'{' exprlist '}' {
+	    $$ = &ArrayConstructExpr{Members: $$2}
+		$$.SetLine($1.Line())
 	}
+
 
 prefixexp:
     var {
@@ -163,6 +172,18 @@ var:
     prefixexp '[' expr ']' {
         $$ = &AttrGetExpr{Object: $1, Key:$3}
         $$.SetLine($1.Line())
+    }
+
+mapitemlist:
+    mapite {
+        $$ = []*MapItemExpr{}
+        $$.SetLine($1.Line())
+    }
+
+mapitem:
+    expr ':' expr {
+       $$ = &MapItemExpr{Key:$1, Value:$3}
+       $$.SetLine($1.Line())
     }
 
 %%
