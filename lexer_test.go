@@ -35,7 +35,7 @@ func Test_Lexer(t *testing.T) {
 				"age" : 234,
 				sleep: true
 				}`,
-				[]string{`<map(<strexpr,age>=><numexpr,234>,<identxpr,sleep>=><true expr>)>`},
+				[]string{`<map(<strexpr,name>=><numexpr,123>,<strexpr,age>=><numexpr,234>,<identxpr,sleep>=><true expr>)>`},
 			},
 		}
 		for _, testCase := range testTable {

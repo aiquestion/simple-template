@@ -12,7 +12,11 @@ var buildIns = map[string]Func{
 	"isNaN":    isNaN,
 }
 
-func NewExecuteContenxt(idents map[string]interface{}, funcs map[string]Func) *ExecuteContext {
+func init() {
+	yyErrorVerbose = true
+}
+
+func NewExecuteContenxt(idents map[string]interface{}, identFuncs map[string]func() (interface{}, error), funcs map[string]Func) *ExecuteContext {
 	finalFunc := make(map[string]Func)
 	for k, v := range buildIns {
 		finalFunc[k] = v
@@ -21,16 +25,19 @@ func NewExecuteContenxt(idents map[string]interface{}, funcs map[string]Func) *E
 		finalFunc[k] = v
 	}
 	return &ExecuteContext{
-		definedIdent: idents,
-		definedFunc:  finalFunc,
+		definedIdent:     idents,
+		definedFunc:      finalFunc,
+		definedIdentFunc: identFuncs,
 	}
 }
 
 type Func func(inputs []interface{}) (interface{}, error)
 
 type ExecuteContext struct {
-	definedIdent map[string]interface{}
-	definedFunc  map[string]Func
+	definedIdent       map[string]interface{}
+	definedIdentFunc   map[string]func() (interface{}, error)
+	definedFunc        map[string]Func
+	AttrGetIgnoreEmpty bool
 }
 
 func (ec *ExecuteContext) EvaluateExpression(expr Expr) (interface{}, error) {
@@ -121,6 +128,13 @@ func (ec *ExecuteContext) evalIdentityExpr(e *IdentExpr) (interface{}, error) {
 	ival := ec.definedIdent[e.Value]
 	if ival != nil {
 		return ival, nil
+	}
+
+	if ec.definedIdentFunc != nil {
+		f := ec.definedIdentFunc[e.Value]
+		if f != nil {
+			return f()
+		}
 	}
 	return nil, fmt.Errorf("%v cannot be find", e.Value)
 }
@@ -389,6 +403,10 @@ func (ec *ExecuteContext) evalAttrGetExpr(e *AttrGetExpr) (interface{}, error) {
 		}
 		return nil, nil
 
+	}
+
+	if ec.AttrGetIgnoreEmpty {
+		return nil, nil
 	}
 
 	return nil, fmt.Errorf("object %v is not array or map", obj)

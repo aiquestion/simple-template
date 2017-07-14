@@ -90,14 +90,28 @@ func TestExecuteContext_EvaluateExpression(t *testing.T) {
 				`[1 2 3 4 5]`,
 			},
 			{
-				`{ name: 123,
-				"age2": true}`,
-				`map[truman:123 age2:true]`,
+				`testf`,
+				`123`,
+			},
+			{
+				`if("222" == 222) {123}else{456}`,
+				`123`,
+			},
+			{
+				`if("222") {123}else{456}`,
+				`123`,
+			},
+			{
+				`if(222) {123}else{456}`,
+				`123`,
 			},
 		}
 
 		test := func(input []interface{}) (interface{}, error) {
 			return fmt.Sprintf("%v,%v", input[0], input[1]), nil
+		}
+		testId := func() (interface{}, error) {
+			return 123, nil
 		}
 		ec := NewExecuteContenxt(map[string]interface{}{
 			"name":     "truman",
@@ -108,6 +122,8 @@ func TestExecuteContext_EvaluateExpression(t *testing.T) {
 				"1": "val1",
 				"2": "val2",
 			},
+		}, map[string]func() (interface{}, error){
+			"testf": testId,
 		}, map[string]Func{
 			"test": test,
 		})
@@ -136,7 +152,7 @@ func BenchmarkExecuteContext_EvaluateExpression(b *testing.B) {
 		"age":      float64(29),
 		"marry":    true,
 		"language": []interface{}{"golang", "erlang", "lisp"},
-	}, map[string]Func{
+	}, nil, map[string]Func{
 		"test": test,
 	})
 	for i := 0; i < b.N; i++ {
