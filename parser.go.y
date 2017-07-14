@@ -180,7 +180,7 @@ var:
 
 mapitemlist:
     mapitem {
-        $$ = make([]*MapItemExpr, 0)
+        $$ = []Expr{$1}
     }|
     mapitemlist ',' mapitem {
         $$ = append($1, $3)

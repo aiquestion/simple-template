@@ -1,8 +1,9 @@
 package simple_template
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func Test_Lexer(t *testing.T) {
@@ -26,7 +27,15 @@ func Test_Lexer(t *testing.T) {
 			},
 			{
 				`{1, 3, 4, 5}`,
-				[]string{`<<<<identxpr,did>[<numexpr,1>]>[<numexpr,2>]>[<strexpr,test>]>`},
+				[]string{`<array(<numexpr,1>,<numexpr,3>,<numexpr,4>,<numexpr,5>)>`},
+			},
+			{
+				`{
+				"name" : 123,
+				"age" : 234,
+				sleep: true
+				}`,
+				[]string{`<map(<strexpr,name>=><numexpr,123>,<strexpr,age>=><numexpr,234>,<identxpr,sleep>=><true expr>)>`},
 			},
 		}
 		for _, testCase := range testTable {

@@ -12,7 +12,11 @@ var buildIns = map[string]Func{
 	"isNaN":    isNaN,
 }
 
-func NewExecuteContenxt(idents map[string]interface{}, funcs map[string]Func) *ExecuteContext {
+func init() {
+	yyErrorVerbose = true
+}
+
+func NewExecuteContenxt(idents map[string]interface{}, identFuncs map[string]func() (interface{}, error), funcs map[string]Func) *ExecuteContext {
 	finalFunc := make(map[string]Func)
 	for k, v := range buildIns {
 		finalFunc[k] = v
@@ -21,16 +25,19 @@ func NewExecuteContenxt(idents map[string]interface{}, funcs map[string]Func) *E
 		finalFunc[k] = v
 	}
 	return &ExecuteContext{
-		definedIdent: idents,
-		definedFunc:  finalFunc,
+		definedIdent:     idents,
+		definedFunc:      finalFunc,
+		definedIdentFunc: identFuncs,
 	}
 }
 
 type Func func(inputs []interface{}) (interface{}, error)
 
 type ExecuteContext struct {
-	definedIdent map[string]interface{}
-	definedFunc  map[string]Func
+	definedIdent       map[string]interface{}
+	definedIdentFunc   map[string]func() (interface{}, error)
+	definedFunc        map[string]Func
+	AttrGetIgnoreEmpty bool
 }
 
 func (ec *ExecuteContext) EvaluateExpression(expr Expr) (interface{}, error) {
@@ -55,8 +62,42 @@ func (ec *ExecuteContext) EvaluateExpression(expr Expr) (interface{}, error) {
 		return ec.evalAttrGetExpr(vt)
 	case *FuncCallExpr:
 		return ec.evalFuncCallExpr(vt)
+	case *MapConstructExpr:
+		return ec.evalMapConstructExpr(vt)
+	case *ArrayConstructExpr:
+		return ec.evalArrayConstructExpr(vt)
 	}
 	return nil, fmt.Errorf("unknow expression %T", expr)
+}
+func (ec *ExecuteContext) evalMapConstructExpr(e *MapConstructExpr) (interface{}, error) {
+	result := make(map[interface{}]interface{})
+	for _, m := range e.Members {
+		mt, ok := m.(*MapItemExpr)
+		if !ok {
+			return nil, fmt.Errorf("line %v map expr with no map item expr", e.Line())
+		}
+		k, err := ec.EvaluateExpression(mt.Key)
+		if err != nil {
+			return nil, err
+		}
+		v, err := ec.EvaluateExpression(mt.Value)
+		if err != nil {
+			return nil, err
+		}
+		result[k] = v
+	}
+	return result, nil
+}
+func (ec *ExecuteContext) evalArrayConstructExpr(e *ArrayConstructExpr) (interface{}, error) {
+	result := make([]interface{}, 0, len(e.Members))
+	for _, m := range e.Members {
+		k, err := ec.EvaluateExpression(m)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, k)
+	}
+	return result, nil
 }
 
 func (ec *ExecuteContext) evalFuncCallExpr(e *FuncCallExpr) (interface{}, error) {
@@ -87,6 +128,13 @@ func (ec *ExecuteContext) evalIdentityExpr(e *IdentExpr) (interface{}, error) {
 	ival := ec.definedIdent[e.Value]
 	if ival != nil {
 		return ival, nil
+	}
+
+	if ec.definedIdentFunc != nil {
+		f := ec.definedIdentFunc[e.Value]
+		if f != nil {
+			return f()
+		}
 	}
 	return nil, fmt.Errorf("%v cannot be find", e.Value)
 }
@@ -355,6 +403,10 @@ func (ec *ExecuteContext) evalAttrGetExpr(e *AttrGetExpr) (interface{}, error) {
 		}
 		return nil, nil
 
+	}
+
+	if ec.AttrGetIgnoreEmpty {
+		return nil, nil
 	}
 
 	return nil, fmt.Errorf("object %v is not array or map", obj)
